@@ -1,0 +1,687 @@
+/* Styles for the landing page only. */
+.landing {
+  --display: 'Young Serif', Georgia, serif;
+  --stamp: 'Doto Variable', Consolas, monospace;
+  --night: #123f5c;
+  --paper: #f3ecdd;
+  --cream: #fbf7ec;
+  --mustard: #f4bd3a;
+  --wood: #a9713f;
+  --wood-dark: #7c4f2a;
+
+  overflow-x: clip;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.landing h1,
+.landing h2,
+.landing h3 {
+  font-family: var(--display);
+  font-weight: 400;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  padding: 22px clamp(20px, 5vw, 72px) 56px;
+  color: var(--cream);
+  /* Kitchen wall tiles. */
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.05) 2px, transparent 2px) 0 0 / 96px 96px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 2px, transparent 2px) 0 0 / 96px 96px,
+    var(--night);
+}
+
+.hero :focus-visible {
+  outline-color: var(--mustard);
+}
+
+.hero-bar,
+.hero-grid {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.hero-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--display);
+  font-size: 22px;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 72px);
+  margin-top: 28px;
+}
+
+.landing .hero-copy h1 {
+  color: var(--cream);
+  font-size: clamp(42px, 5.6vw, 80px);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+}
+
+.hero-copy p {
+  max-width: 44ch;
+  margin-top: 24px;
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.hero-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+  padding: 15px 24px;
+  border-radius: 4px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--mustard);
+  box-shadow: 0 5px 0 #b98514;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.hero-button:hover {
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 #b98514;
+}
+
+.hero-button:active {
+  transform: translateY(5px);
+  box-shadow: none;
+}
+
+.hero-button svg {
+  transition: transform 0.15s;
+}
+
+.hero-button:hover svg {
+  transform: translateX(4px);
+}
+
+/* ---------- The shelf drawing ---------- */
+.shelf {
+  margin: 0;
+  min-width: 0;
+}
+
+.shelf-scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 72vh;
+}
+
+.shelf-rough {
+  animation: boil 0.75s steps(1) infinite;
+}
+
+@keyframes boil {
+  0% {
+    filter: url(#rough-0);
+  }
+  33% {
+    filter: url(#rough-1);
+  }
+  66% {
+    filter: url(#rough-2);
+  }
+}
+
+.shelf-back {
+  fill: #e9dcc0;
+}
+
+.shelf-back-boards {
+  fill: none;
+  stroke: #cdbb96;
+  stroke-width: 2;
+}
+
+.shelf-wood {
+  fill: var(--wood);
+  stroke: var(--wood-dark);
+  stroke-width: 3;
+}
+
+.shelf-ink path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.shelf-item {
+  transition: filter 0.6s, transform 0.6s;
+}
+
+.shelf-item-text {
+  font-family: var(--display);
+  text-anchor: middle;
+}
+
+/* Expired products lose their colour and start to sag. */
+.shelf-item-expired {
+  filter: saturate(0.45) brightness(0.92);
+  transform: rotate(-2.5deg);
+}
+
+.shelf-spoil {
+  animation: spoil-in 0.6s ease-out;
+}
+
+.shelf-stink {
+  fill: none;
+  stroke: #5c8a4a;
+  stroke-width: 3;
+  stroke-linecap: round;
+  animation: stink 2.4s ease-in-out infinite;
+}
+
+.shelf-stink + .shelf-stink {
+  animation-delay: 0.8s;
+}
+
+@keyframes spoil-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes stink {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(4px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+.shelf-label {
+  transform-origin: 0 4px;
+  animation: label-swing 0.8s ease-out;
+}
+
+@keyframes label-swing {
+  0% {
+    transform: rotate(9deg);
+  }
+  35% {
+    transform: rotate(-6deg);
+  }
+  70% {
+    transform: rotate(3deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+.shelf-label-card {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.shelf-label-safe {
+  fill: var(--safe-soft);
+}
+
+.shelf-label-soon {
+  fill: #ffdca8;
+}
+
+.shelf-label-expired {
+  fill: #f9c5bf;
+}
+
+.shelf-label-date {
+  font-family: var(--stamp);
+  font-size: 23px;
+  font-weight: 900;
+  text-anchor: middle;
+  fill: var(--ink);
+}
+
+.shelf-label-status {
+  font-size: 15px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.shelf-text-safe {
+  fill: var(--safe);
+}
+
+.shelf-text-soon {
+  fill: #8a3506;
+}
+
+.shelf-text-expired {
+  fill: #912018;
+}
+
+.shelf-bell {
+  transform-origin: 0 -36px;
+  animation: bell-ring 0.7s ease-in-out;
+}
+
+.shelf-bell-body {
+  fill: var(--mustard);
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+@keyframes bell-ring {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(14deg);
+  }
+  45% {
+    transform: rotate(-11deg);
+  }
+  70% {
+    transform: rotate(6deg);
+  }
+}
+
+.shelf-fly {
+  offset-path: path('M120 150 C200 40 330 60 300 130 S160 210 230 120 S420 20 480 110 S330 220 120 150');
+  offset-rotate: 0deg;
+  animation: fly 11s linear infinite;
+}
+
+.shelf-fly-wing {
+  fill: rgba(23, 33, 46, 0.35);
+  animation: wing 0.09s steps(2) infinite;
+}
+
+@keyframes fly {
+  to {
+    offset-distance: 100%;
+  }
+}
+
+@keyframes wing {
+  to {
+    transform: translateY(1.5px);
+  }
+}
+
+/* ---------- Calendar and slider under the shelf ---------- */
+.shelf-controls {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.tear-off {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 78px;
+  padding-bottom: 5px;
+  border-radius: 3px;
+  color: var(--ink);
+  background: var(--cream);
+  transform-origin: top;
+  animation: tear-off 0.28s ease-out;
+}
+
+.tear-off-month {
+  align-self: stretch;
+  padding: 1px 0;
+  border-radius: 3px 3px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--expired);
+}
+
+.tear-off-day {
+  font-family: var(--display);
+  font-size: 34px;
+  line-height: 1.15;
+}
+
+.tear-off-weekday {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+@keyframes tear-off {
+  from {
+    transform: rotateX(-50deg);
+    opacity: 0.4;
+  }
+}
+
+.shelf-slider {
+  flex: 1;
+  min-width: 0;
+}
+
+.shelf-slider label {
+  display: block;
+  font-size: 15px;
+}
+
+.shelf-slider strong {
+  color: var(--mustard);
+  font-weight: 600;
+}
+
+.shelf-slider input {
+  display: block;
+  width: 100%;
+  height: 24px;
+  margin: 4px 0 6px;
+  accent-color: var(--mustard);
+  cursor: grab;
+}
+
+.shelf-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ---------- The expiry rule ---------- */
+.rule,
+.desk {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 88px clamp(20px, 5vw, 72px) 0;
+}
+
+.landing .rule h2,
+.landing .desk h2 {
+  font-size: clamp(30px, 3.6vw, 46px);
+}
+
+.rule-intro {
+  max-width: 52ch;
+  margin-top: 12px;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.ruler {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3fr 3fr 4fr;
+  height: 92px;
+  margin: 40px 0 44px;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+}
+
+.ruler-zone {
+  display: flex;
+  align-items: flex-end;
+  padding: 0 14px 12px;
+  font-family: var(--display);
+  font-size: clamp(16px, 2.1vw, 24px);
+  /* Ruler markings along the top edge. */
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--ink) 0 2px,
+    transparent 2px 22px
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 16px;
+}
+
+.ruler-expired {
+  background-color: #f9c5bf;
+}
+
+.ruler-soon {
+  background-color: #ffdca8;
+}
+
+.ruler-safe {
+  background-color: #bfe8cd;
+}
+
+.ruler-mark {
+  position: absolute;
+  top: 100%;
+  font-size: 15px;
+  font-weight: 700;
+  transform: translateX(-50%);
+  padding-top: 18px;
+}
+
+.ruler-mark::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 16px;
+  border-left: 2px solid var(--ink);
+}
+
+.ruler-mark-today {
+  left: 30%;
+}
+
+.ruler-mark-seven {
+  left: 60%;
+}
+
+.rule-note {
+  color: var(--text-muted);
+}
+
+/* ---------- Screenshot and receipt ---------- */
+.desk {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  align-items: start;
+  gap: clamp(32px, 5vw, 72px);
+  padding-bottom: 96px;
+}
+
+.desk-photo {
+  position: relative;
+  padding: 12px 12px 10px;
+  background: #fff;
+  box-shadow: 0 2px 3px rgba(23, 33, 46, 0.2), 0 14px 28px rgba(23, 33, 46, 0.14);
+  transform: rotate(-1.4deg);
+}
+
+.desk-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+}
+
+.desk-photo p {
+  margin-top: 9px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.desk-tape {
+  position: absolute;
+  top: -15px;
+  left: calc(50% - 62px);
+  width: 124px;
+  height: 32px;
+  background: rgba(244, 189, 58, 0.62);
+  transform: rotate(1.8deg);
+}
+
+.desk-side > p {
+  margin-top: 12px;
+  font-size: 18px;
+}
+
+.receipt {
+  max-width: 340px;
+  margin-top: 30px;
+  padding: 22px 22px 34px;
+  font-family: var(--stamp);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: #27303c;
+  background: #fff;
+  filter: drop-shadow(0 6px 8px rgba(23, 33, 46, 0.2));
+  /* Torn zigzag along the bottom edge. */
+  clip-path: polygon(
+    0 0, 100% 0, 100% 100%,
+    95% calc(100% - 10px), 90% 100%, 85% calc(100% - 10px), 80% 100%,
+    75% calc(100% - 10px), 70% 100%, 65% calc(100% - 10px), 60% 100%,
+    55% calc(100% - 10px), 50% 100%, 45% calc(100% - 10px), 40% 100%,
+    35% calc(100% - 10px), 30% 100%, 25% calc(100% - 10px), 20% 100%,
+    15% calc(100% - 10px), 10% 100%, 5% calc(100% - 10px), 0 100%
+  );
+}
+
+.landing .receipt h3 {
+  font-family: var(--stamp);
+  font-size: 25px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.receipt > p {
+  text-align: center;
+}
+
+.receipt hr {
+  margin: 12px 0;
+  border: none;
+  border-top: 2px dashed #27303c;
+}
+
+.receipt ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.receipt li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.landing-footer {
+  padding: 22px clamp(20px, 5vw, 72px);
+  font-size: 14px;
+  color: var(--cream);
+  background: var(--night);
+}
+
+/* Browsers that support it animate these as they scroll into view.
+   Others simply show them in place. */
+@supports (animation-timeline: view()) {
+  .desk-photo {
+    animation: photo-land linear both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 80%;
+  }
+
+  .receipt {
+    animation: receipt-print linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 90%;
+  }
+
+  @keyframes photo-land {
+    from {
+      opacity: 0;
+      transform: translateY(60px) rotate(2deg);
+    }
+  }
+
+  @keyframes receipt-print {
+    from {
+      transform: translateY(-40px);
+      opacity: 0;
+    }
+  }
+}
+
+/* ---------- Tablet and phone ---------- */
+@media (max-width: 960px) {
+  .hero-grid,
+  .desk {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shelf-scene {
+    max-height: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero {
+    padding-bottom: 40px;
+  }
+
+  .rule,
+  .desk {
+    padding-top: 64px;
+  }
+
+  .ruler {
+    height: 80px;
+  }
+
+  .ruler-zone {
+    padding: 0 8px 10px;
+  }
+
+  .receipt {
+    max-width: none;
+  }
+
+  .tear-off {
+    width: 66px;
+  }
+
+  /* The drawing shrinks to about half size on a phone. */
+  .shelf-label-status {
+    font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* Respect the visitor's system setting for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .landing *,
+  .landing *::before,
+  .landing *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .shelf-rough {
+    filter: url(#rough-0);
+  }
+
+  .shelf-fly {
+    display: none;
+  }
+}
