@@ -1,0 +1,72 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, ci-cd-ec2]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Test backend
+        working-directory: backend
+        run: |
+          npm ci
+          npm test
+      - name: Lint and build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run lint
+          npm run build
+      - name: Package
+        run: |
+          mkdir -p release/backend release/frontend
+          tar -cf - --exclude=node_modules --exclude=.env -C backend . | tar -xf - -C release/backend
+          cp -r frontend/dist/. release/frontend/
+          echo "$GITHUB_SHA" > release/REVISION
+          tar -czf release.tgz -C release .
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release
+          path: release.tgz
+          retention-days: 3
+
+  # Publishes the tested build to the "deploy" branch. The EC2 server checks
+  # that branch every minute and installs new builds, so no secrets are needed.
+  publish:
+    needs: test-and-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: publish-deploy-branch
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release
+      - name: Push build to the deploy branch
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          mkdir out
+          tar -xzf release.tgz -C out
+          cd out
+          git init -q -b deploy
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -f
+          git commit -q -m "Build of $GITHUB_SHA"
+          auth="$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)"
+          git -c "http.extraheader=AUTHORIZATION: basic $auth" push -q --force "https://github.com/$GITHUB_REPOSITORY.git" deploy
