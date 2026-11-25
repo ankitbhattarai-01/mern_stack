@@ -3,7 +3,7 @@ import axios from 'axios'
 // Every request to the backend goes through this file, so components never
 // need to know the server's address.
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL ?? '/api',
 })
 
 // The backend wraps its data as { success, message, result }.
