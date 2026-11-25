@@ -2,7 +2,7 @@ name: CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [main, ci-cd-ec2]
   pull_request:
     branches: [main]
 
@@ -30,62 +30,43 @@ jobs:
           npm run build
       - name: Package
         run: |
-          tar -czf backend.tgz --exclude=node_modules --exclude=.env -C backend .
-          tar -czf frontend.tgz -C frontend/dist .
+          mkdir -p release/backend release/frontend
+          tar -cf - --exclude=node_modules --exclude=.env -C backend . | tar -xf - -C release/backend
+          cp -r frontend/dist/. release/frontend/
+          echo "$GITHUB_SHA" > release/REVISION
+          tar -czf release.tgz -C release .
       - uses: actions/upload-artifact@v7
         with:
           name: release
-          path: |
-            backend.tgz
-            frontend.tgz
+          path: release.tgz
           retention-days: 3
 
-  deploy:
+  # Publishes the tested build to the "deploy" branch. The EC2 server checks
+  # that branch every minute and installs new builds, so no secrets are needed.
+  publish:
     needs: test-and-build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     concurrency:
-      group: deploy-production
+      group: publish-deploy-branch
       cancel-in-progress: false
-    env:
-      HOST: ${{ secrets.EC2_HOST }}
     steps:
       - uses: actions/download-artifact@v8
         with:
           name: release
-      - name: Set up SSH
+      - name: Push build to the deploy branch
         env:
-          KEY: ${{ secrets.EC2_DEPLOY_KEY }}
-          KNOWN_HOSTS: ${{ secrets.EC2_KNOWN_HOSTS }}
+          TOKEN: ${{ github.token }}
         run: |
-          umask 077
-          mkdir -p ~/.ssh
-          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
-          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
-      - name: Upload
-        run: |
-          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "ec2-user@$HOST" 'mkdir -p ~/release'
-          scp -i ~/.ssh/id_deploy -o BatchMode=yes backend.tgz frontend.tgz "ec2-user@$HOST:release/"
-      - name: Deploy and check
-        run: |
-          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "ec2-user@$HOST" 'bash -s' <<'REMOTE'
-          set -eu
-          app=/home/ec2-user/mern_stack/backend
-          web=/var/www/expiryalert
-          # The server's own .env is never in the package, so it is kept.
-          tar -xzf ~/release/backend.tgz -C "$app"
-          cd "$app"
-          npm ci --omit=dev --no-audit --no-fund </dev/null
-          pm2 restart backend </dev/null
-          tar -xzf ~/release/frontend.tgz -C "$web"
-          for i in $(seq 1 15); do
-            if curl -fsS -m 5 http://127.0.0.1/api/dashboard/stats >/dev/null; then
-              echo "Deployed and healthy"
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "The API or database check failed" >&2
-          pm2 list
-          exit 1
-          REMOTE
+          mkdir out
+          tar -xzf release.tgz -C out
+          cd out
+          git init -q -b deploy
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -f
+          git commit -q -m "Build of $GITHUB_SHA"
+          auth="$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)"
+          git -c "http.extraheader=AUTHORIZATION: basic $auth" push -q --force "https://github.com/$GITHUB_REPOSITORY.git" deploy
